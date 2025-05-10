@@ -9,6 +9,7 @@ services:
     volumes:
       - ./pihole/etc-pihole:/etc/pihole
       - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+      - ./pihole/etc-pihole/pihole.log:/var/log/pihole.log
     ports:
       - "8053:53/tcp"
       - "8053:53/udp"
@@ -27,10 +28,10 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    user: "472"
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
       - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
     networks:
@@ -95,6 +96,7 @@ services:
       context: ./log-reader
     container_name: log-reader
     volumes:
+      - ./log-reader:/app
       - ./pihole/etc-pihole/pihole.log:/logs/pihole.log:ro
     environment:
       - OPENAI_API_KEY=sk-9bdd1620c9d84ebf98e014cf7451202a

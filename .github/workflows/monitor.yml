@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -21,6 +22,9 @@ jobs:
     - name: 📦 Install Docker Compose CLI (for `docker compose`)
       run: |
         sudo apt-get update
+        
+        mkdir -p ./pihole/etc-pihole
+        touch ./pihole/etc-pihole/pihole.log
 
     - name: 🔧 Build Docker Compose Services
       run: docker compose build --no-cache
@@ -29,24 +33,22 @@ jobs:
 
     - name: 🚀 Start Network Monitor Stack
       run: docker compose up -d
-      continue-on-error: false
+      
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-    - name: 📊 List Running 
+    - name: 📊 List Running Containers
       run: docker compose ps
-      continue-on-error: false
 
     - name: 📈 Check Grafana Logs
       run: docker compose logs grafana | tail -n 50
-      continue-on-error: false
-    
-    - name: 🧪 Test log-reader logs
-      run: docker compose logs log-reader | tail -n 20
-      continue-on-error: false
 
     - name: 🤖 Run ML Agent Manually
-      run: docker compose exec ml-agent python model.py
+      run: docker compose exec ml-agent python run.py
       continue-on-error: true
 
+    - name: 🧪 Test log-reader logs
+      run: docker compose logs log-reader | tail -n 20
 
-    - name: Take down all containers
+    - name: 🧹 Clean Up
       run: docker compose down -v
