@@ -1,4 +1,4 @@
-name: 🛠️ Build & Launch Network Monitor
+name: 💠 Build & Launch Network Monitor
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 📥 Checkout Repository
+    - name: 📅 Checkout Repository
       uses: actions/checkout@v4
 
     - name: 🐳 Set up Docker
@@ -28,28 +28,33 @@ jobs:
 
     - name: 🔧 Build Docker Compose Services
       run: docker compose build --no-cache
-      continue-on-error: false
-    
 
     - name: 🚀 Start Network Monitor Stack
       run: docker compose up -d
-      
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     - name: 📊 List Running Containers
       run: docker compose ps
 
+    - name: 🔍 Run One-Time Nmap Scan
+      run: docker compose exec nmap-scanner sh -c "sh /nmap/scan.sh && tail -n 100 /nmap/scan_result.xml"
+
     - name: 📈 Check Grafana Logs
       run: docker compose logs grafana | tail -n 50
+
+    - name: 🤖 Run ML Agent Manually
+      run: docker compose exec ml-agent python run.py
+      continue-on-error: true
 
     - name: 🧪 Test log-reader logs
       run: docker compose logs log-reader | tail -n 20
 
-    - name: 🤖 Run ML Agent Manually
-      run: docker compose exec ml-agent python run.py
-      continue-on-error: false
-
+    - name: 📅 Upload Nmap Scan Result
+      uses: actions/upload-artifact@v3
+      with:
+        name: nmap-scan-result
+        path: ./nmap/scan_result.xml
 
     - name: 🧹 Clean Up
       run: docker compose down -v
