@@ -11,26 +11,26 @@ jobs:
 
     steps:
     - name: 📥 Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 🐳 Set up Docker
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v
 
     - name: 🔧 Build Docker Compose Services
-      run: docker-compose build --no-cache
+      run: docker compose build --no-cache
 
     - name: 🚀 Start Network Monitor Stack
-      run: docker-compose up -d
+      run: docker compose up -d
 
     - name: 📊 List Running Containers
-      run: docker-compose ps
+      run: docker compose ps
 
     - name: 📈 Check Grafana Logs
-      run: docker-compose logs grafana | tail -n 50
+      run: docker compose logs grafana | tail -n 50
 
     - name: 🤖 Run ML Agent Manually
-      run: docker-compose exec ml-agent python run.py
+      run: docker compose exec ml-agent python run.py
       continue-on-error: true  # Avoid full failure if model isn't ready
 
     - name: 🧪 Test log-reader logs
-      run: docker-compose logs log-reader | tail -n 20
+      run: docker compose logs log-reader | tail -n 20
