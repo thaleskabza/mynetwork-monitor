@@ -1,0 +1,6 @@
+pandas
+scikit-learn
+sklearn.ensemble
+numpy
+pandas
+influxdb  # InfluxDB client for querying metrics

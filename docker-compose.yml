@@ -1,5 +1,4 @@
-
-
+version: "3.9"
 
 services:
 
@@ -94,24 +93,21 @@ services:
     restart: unless-stopped
 
   log-reader:
-    image: python:3.10-slim
+    build:
+      context: ./log-reader
     container_name: log-reader
     volumes:
-      - ./log-reader:/app
       - ./pihole/etc-pihole/pihole.log:/logs/pihole.log:ro
-    working_dir: /app
-    command: ["python", "main.py"]
+    environment:
+      - OPENAI_API_KEY=sk-9bdd1620c9d84ebf98e014cf7451202a
     networks:
       - mynetwork
     restart: unless-stopped
-    
+
   ml-agent:
-    image: python:3.10-slim
+    build:
+      context: ./ml-agent
     container_name: ml-agent
-    volumes:
-      - ./ml-agent:/app
-    working_dir: /app
-    command: ["python", "run.py"]
     depends_on:
       - influxdb
     networks:
@@ -119,5 +115,4 @@ services:
 
 networks:
   mynetwork:
-     driver: bridge
-     
+    driver: bridge

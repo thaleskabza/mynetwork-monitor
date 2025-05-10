@@ -1,11 +1,14 @@
-from openai import OpenAI
 import os
+import openai
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def summarize_logs(log_data):
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    prompt = f"Summarize and identify any suspicious patterns in:\n\n{log_data}"
-    completion = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4o",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[
+            {"role": "system", "content": "You're a security analyst."},
+            {"role": "user", "content": f"Summarize this:\n{log_data}"}
+        ]
     )
-    return completion.choices[0].message.content
+    return response.choices[0].message.content
