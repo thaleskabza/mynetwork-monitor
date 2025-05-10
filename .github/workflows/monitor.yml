@@ -26,12 +26,13 @@ jobs:
       run: docker compose build --no-cache
       continue-on-error: false
     
-    - name: 📊 List Running 
-      run: docker compose ps
-      continue-on-error: false
 
     - name: 🚀 Start Network Monitor Stack
       run: docker compose up -d
+      continue-on-error: false
+
+    - name: 📊 List Running 
+      run: docker compose ps
       continue-on-error: false
 
     - name: 📈 Check Grafana Logs
