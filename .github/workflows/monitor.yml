@@ -36,9 +36,6 @@ jobs:
     - name: 📊 List Running Containers
       run: docker compose ps
 
-    - name: 🔍 Run One-Time Nmap Scan
-      run: docker compose exec nmap-scanner sh -c "sh /nmap/scan.sh && tail -n 100 /nmap/scan_result.xml"
-
     - name: 📈 Check Grafana Logs
       run: docker compose logs grafana | tail -n 50
 
