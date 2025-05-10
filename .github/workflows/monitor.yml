@@ -24,19 +24,28 @@ jobs:
 
     - name: 🔧 Build Docker Compose Services
       run: docker compose build --no-cache
+      continue-on-error: false
+    
+    - name: 📊 List Running 
+      run: docker compose ps
+      continue-on-error: false
 
     - name: 🚀 Start Network Monitor Stack
       run: docker compose up -d
-
-    - name: 📊 List Running Containers
-      run: docker compose ps
+      continue-on-error: false
 
     - name: 📈 Check Grafana Logs
       run: docker compose logs grafana | tail -n 50
+      continue-on-error: false
+    
+    - name: 🧪 Test log-reader logs
+      run: docker compose logs log-reader | tail -n 20
+      continue-on-error: false
 
     - name: 🤖 Run ML Agent Manually
       run: docker compose exec ml-agent python model.py
       continue-on-error: true
 
-    - name: 🧪 Test log-reader logs
-      run: docker compose logs log-reader | tail -n 20
+
+    - name: Take down all containers
+      run: docker compose down -v
