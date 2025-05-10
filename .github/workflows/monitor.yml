@@ -3,7 +3,7 @@ name: 💠 Build & Launch Network Monitor
 on:
   push:
     branches: [main]
-  workflow_dispatch:
+
 
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -21,8 +21,7 @@ jobs:
 
     - name: 📦 Install Docker Compose CLI (for `docker compose`)
       run: |
-        sudo apt-get update
-        
+        sudo apt-get update 
         mkdir -p ./pihole/etc-pihole
         touch ./pihole/etc-pihole/pihole.log
 
