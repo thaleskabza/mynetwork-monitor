@@ -85,7 +85,7 @@ services:
     container_name: nmap-scanner
     volumes:
       - ./nmap:/nmap
-    entrypoint: ["/bin/sh", "-c", "while true; do sh /nmap/scan.sh; sleep 3600; done"]
+    entrypoint: ["/bin/sh", "-c", "while true; do sh /nmap/scan.sh; sleep 10000; done"]
     networks:
       - mynetwork
     restart: unless-stopped
