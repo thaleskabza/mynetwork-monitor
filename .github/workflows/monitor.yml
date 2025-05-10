@@ -39,12 +39,8 @@ jobs:
     - name: 📈 Check Grafana Logs
       run: docker compose logs grafana | tail -n 50
 
-    - name: 🤖 Run ML Agent Manually
-      run: docker compose exec ml-agent python run.py
-      continue-on-error: true
-
     - name: 🧪 Test log-reader logs
-      run: docker compose logs log-reader | tail -n 20
+      run: docker compose logs log-reader | tail -n 50
 
     - name: 📅 Upload Nmap Scan Result
       uses: actions/upload-artifact@v4
