@@ -1,0 +1,123 @@
+
+
+
+services:
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    environment:
+      TZ: "Africa/Johannesburg"
+      WEBPASSWORD: "admin"
+    volumes:
+      - ./pihole/etc-pihole:/etc/pihole
+      - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80"
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  ntopng:
+    image: ntop/ntopng:latest
+    container_name: ntopng
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=network_monitor
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=adminpass
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  telegraf:
+    image: telegraf:1.25
+    container_name: telegraf
+    depends_on:
+      - influxdb
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    environment:
+      - HOST_PROC=/host/proc
+      - HOST_SYS=/host/sys
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  nmap-cron:
+    image: instrumentisto/nmap
+    container_name: nmap-scanner
+    volumes:
+      - ./nmap:/nmap
+    entrypoint: ["/bin/sh", "-c", "while true; do sh /nmap/scan.sh; sleep 3600; done"]
+    networks:
+      - mynetwork
+    restart: unless-stopped
+
+  log-reader:
+    image: python:3.10-slim
+    container_name: log-reader
+    volumes:
+      - ./log-reader:/app
+      - ./pihole/etc-pihole/pihole.log:/logs/pihole.log:ro
+    working_dir: /app
+    command: ["python", "main.py"]
+    networks:
+      - mynetwork
+    restart: unless-stopped
+    
+  ml-agent:
+    image: python:3.10-slim
+    container_name: ml-agent
+    volumes:
+      - ./ml-agent:/app
+    working_dir: /app
+    command: ["python", "run.py"]
+    depends_on:
+      - influxdb
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+     driver: bridge
+     

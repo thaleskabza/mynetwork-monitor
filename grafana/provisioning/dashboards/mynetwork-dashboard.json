@@ -1,0 +1,38 @@
+{
+    "id": null,
+    "uid": "mynetwork",
+    "title": "MyNetwork Monitor",
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "CPU Usage",
+        "targets": [
+          {
+            "measurement": "cpu",
+            "groupBy": [{"type": "time", "params": ["$__interval"]}],
+            "select": [[{"type": "field", "params": ["usage_user"]}, {"type": "mean"}]],
+            "refId": "A"
+          }
+        ],
+        "datasource": "InfluxDB"
+      },
+      {
+        "type": "graph",
+        "title": "Memory Usage",
+        "targets": [
+          {
+            "measurement": "mem",
+            "fields": [],
+            "select": [[{"type": "field", "params": ["used_percent"]}, {"type": "mean"}]],
+            "refId": "B"
+          }
+        ],
+        "datasource": "InfluxDB"
+      }
+    ]
+  }
+  
