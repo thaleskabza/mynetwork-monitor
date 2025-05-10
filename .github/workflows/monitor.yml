@@ -35,7 +35,7 @@ jobs:
       run: docker compose logs grafana | tail -n 50
 
     - name: 🤖 Run ML Agent Manually
-      run: docker compose exec ml-agent python run.py
+      run: docker compose exec ml-agent python model.py
       continue-on-error: true
 
     - name: 🧪 Test log-reader logs
